@@ -1,0 +1,9 @@
+Windows Registry Editor Version 5.00
+
+; 右键目录背景时显示 "Open with Terminal"
+[HKEY_CLASSES_ROOT\Directory\Background\shell\wt]
+@="Open with Terminal"
+"Icon"="E:\\SafeTools\\ThemeTools\\ICON\\Icon\\terminal.ico"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\wt\command]
+@="\"D:\\SoftWare\\terminal-1.24.10621.0\\wt.exe\" -d ."
