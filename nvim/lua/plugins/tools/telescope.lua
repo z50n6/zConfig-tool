@@ -4,6 +4,34 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
+    keys = {
+      -- 对应 LazyVim 原 `<leader>fb` / `<leader>fB`，迁到 `<leader>b` 组
+      {
+        "<leader>bb",
+        function()
+          require("telescope.builtin").buffers({
+            sort_mru = true,
+            sort_lastused = true,
+            ignore_current_buffer = true,
+          })
+        end,
+        desc = "缓冲列表 (常用切换)",
+      },
+      {
+        "<leader>bB",
+        function()
+          require("telescope.builtin").buffers()
+        end,
+        desc = "缓冲列表 (全部)",
+      },
+      { "<leader>fb", false },
+      { "<leader>fB", false },
+      {
+        "<leader>fk",
+        "<cmd>Telescope keymaps<cr>",
+        desc = "搜索快捷键 (Telescope keymaps)",
+      },
+    },
     dependencies = {
       "nvim-lua/plenary.nvim",
       -- 更快的排序/匹配（Windows 下可能需要编译环境；没有也不影响 Telescope 本体使用）
@@ -35,6 +63,9 @@ return {
       telescope.setup(opts)
       pcall(telescope.load_extension, "fzf")
       pcall(telescope.load_extension, "file_browser")
+      -- 与 LazyVim 合并 keys 时 `{ "<leader>fb", false }` 可能不生效，加载后再删一次
+      pcall(vim.keymap.del, "n", "<leader>fb")
+      pcall(vim.keymap.del, "n", "<leader>fB")
     end,
   },
 }

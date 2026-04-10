@@ -61,6 +61,17 @@ return {
   },
   {
     "mason-org/mason.nvim",
+    -- 避免启动或首次打开文件时后台安装拖慢体验；
+    -- 需要时再用 :Mason / :MasonInstall 等命令触发加载。
+    event = "VeryLazy",
+    cmd = {
+      "Mason",
+      "MasonInstall",
+      "MasonUpdate",
+      "MasonUninstall",
+      "MasonUninstallAll",
+      "MasonLog",
+    },
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       add_unique(opts.ensure_installed, {

@@ -32,7 +32,9 @@ return {
         },
       },
       inlay_hints = { enabled = true },
-      codelens = { enabled = true },
+      -- Codelens 会在部分语言里于 BufEnter/InsertLeave 等时机刷新，
+      -- 从文件树打开文件时容易带来明显卡顿，先默认关闭。
+      codelens = { enabled = false },
       servers = {
         lua_ls = {
           settings = {

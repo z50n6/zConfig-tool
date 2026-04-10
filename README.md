@@ -1,346 +1,164 @@
-# 
+## zConfig-tool
 
-terminal下载：
-- [GitHub - microsoft/terminal: The new Windows Terminal and the original Windows console host, all in the same place!](https://github.com/microsoft/terminal)
+一套以 **Windows** 为主的个人配置集合：`PowerShell` / `Starship` / `NuShell` / `Neovim(LazyVim)` / `Yazi` / `Hexo`，以及 Windows Terminal 右键菜单注册表脚本等。
 
-powershell下载：
+### 你会得到什么
 
-- [GitHub - PowerShell/PowerShell: PowerShell for every system!](https://github.com/PowerShell/PowerShell)
+- **可直接落地的配置文件**：按目录划分，复制到对应系统路径即可生效
+- **Neovim（LazyVim）增强**：包含 LSP/格式化/搜索/终端/Git/AI（Codex、Claude Code）等分域配置与键位速查
+- **NuShell 完整体验**：主题、代理、别名 + `nushell/script/*` 的一系列自定义补全
+- **Yazi**：启用隐藏文件、Catppuccin 主题、较完整的键位映射
 
-NerdFont下载：
+### 仓库结构
 
-- [Nerd Fonts - Iconic font aggregator, glyphs/icons collection, & fonts patcher](https://www.nerdfonts.com/font-downloads)
-
-starship下载：
-
-- [GitHub - starship/starship: ☄🌌️ The minimal, blazing-fast, and infinitely customizable prompt for any shell!](https://github.com/starship/starship)
-
-fastfetch下载：
-- [Title Unavailable \| Site Unreachable](https://github.com/fastfetch-cli/fastfetch/)
-- `scoop install fastfetch`
-
-nushell下载
-
-- `scoop install nu`
-
-neovim下载：
-
-- [https://github.com/neovim/neovim/blob/master/INSTALL.md](https://github.com/neovim/neovim/blob/master/INSTALL.md)
-
-neovide下载：
-
-- [https://neovide.dev/](https://neovide.dev/)
-
-Zoxide  目录跳转
-
-- https://github.com/ajeetdsouza/zoxide
-
-# 1. powershell设置
-
-
-
-如果是win11的话会自带terminal，我是给卸载了，【设置->应用->安装的应用】
-
-
-```lua
-set-ExecutionPolicy RemoteSigned
-
-# 安装Terminal-Icons
-Install-Module -Name Terminal-Icons -Repository PSGallery
-
-# 安装显示Git状态汇总信息
-Install-Module posh-git -Scope CurrentUser
-
-# 补全
-Install-Module PSReadLine -Force
-
-#文件搜索
-Install-Module -Name PSFzf
-
-# Directory jumper
-Install-Module -Name z
+```text
+.
+├─ README.md
+├─ add-wt-right-click.reg         # Windows Terminal 右键菜单（目录背景）
+├─ imgs/                          # README 截图
+├─ powershell/                    # PowerShell profile 与脚本
+│  └─ Microsoft.PowerShell_profile.ps1
+├─ starship/                      # Starship 配置
+│  └─ starship.toml
+├─ nushell/                       # NuShell 主配置 + 补全脚本集合
+│  ├─ config.nu
+│  ├─ env.nu
+│  └─ script/
+├─ nvim/                          # Neovim(LazyVim) 配置
+│  ├─ init.lua
+│  └─ lua/...
+├─ yazi/                          # Yazi 配置（含 catppuccin flavors）
+│  ├─ yazi.toml
+│  ├─ keymap.toml
+│  ├─ theme.toml
+│  └─ flavors/
+└─ hexo/                          # Hexo blog 配置（anzhiyu 主题）
+   ├─ _config.yml
+   └─ _config.anzhiyu.yml
 ```
 
-#### 代理
+### 快速开始（Windows）
 
-现在，你可以在 PowerShell 中使用以下命令：
+> 下面用的是“复制覆盖”的方式；如果你希望一处修改、处处生效，建议用符号链接（见“同步与更新”）。
 
-- 输入 `proxy` 来启用代理
-- 输入 `unproxy` 来禁用代理
-- 输入 `check-proxy` 来查看当前的代理设置
+#### 0) 基础依赖（建议用 Scoop）
 
-> 1. 这个设置只影响当前的 PowerShell 会话，不会影响其他应用程序或系统级的代理设置。
-> 2. 如果你的代理地址和端口不是 `127.0.0.1:7890`，请相应地修改函数中的 URL。
+至少建议准备：
 
-#### 添加右键菜单
+- **终端**：Windows Terminal / PowerShell 7（`pwsh`）
+- **字体**：任意 Nerd Font（确保图标显示正常）
+- **工具**：`git`、`ripgrep (rg)`、`fd`
+- **可选**：`zoxide`（目录跳转）、`fastfetch`（系统信息）
 
-1. 打开注册表编辑器（`regedit`）。
+#### 1) PowerShell（profile）
 
-2. 导航到以下路径：
+- **源文件**：`powershell/Microsoft.PowerShell_profile.ps1`
+- **目标位置（常见）**：`$PROFILE` 指向的路径（PowerShell 中运行 `$PROFILE` 查看）
 
-   ```
-   HKEY_CLASSES_ROOT\Directory\Background\shell
-   ```
+你这份 profile 里包含：
 
-   这个路径用于添加右键菜单到文件夹背景。如果你想添加到文件夹本身，可以导航到：
+- UTF-8 输入输出
+- `Terminal-Icons`、`posh-git`、`PSFzf`、`PSReadLine` 配置
+- `proxy / unproxy / check-proxy` 三个函数（默认 `http://127.0.0.1:7890`）
+- `zoxide init powershell`
 
-   ```
-   HKEY_CLASSES_ROOT\Directory\shell
-   ```
+安装模块示例：
 
-3. 在 `shell` 键下，右键点击空白处，选择“新建” > “项”，命名为 `WindowsTerminal`（或者你想要的名称）。
+```powershell
+Set-ExecutionPolicy RemoteSigned
+Install-Module -Name Terminal-Icons -Repository PSGallery
+Install-Module -Name posh-git -Scope CurrentUser
+Install-Module -Name PSReadLine -Force
+Install-Module -Name PSFzf
+```
 
-4. 在新建的 `WindowsTerminal` 项中，右键点击空白处，选择“新建” > “项”，命名为 `command`。
+#### 2) Starship
 
-5. 在 `command` 项中，双击右侧窗口中的 `(默认)` 值，输入以下内容：
+- **源文件**：`starship/starship.toml`
+- **目标位置**：`%USERPROFILE%\.config\starship.toml`（即 `~/.config/starship.toml`）
 
-   ```
-   "C:\Apps\WindowsTerminal\WindowsTerminal.exe" --profile "默认配置文件名称" --new-tab -d "%V"
-   ```
+NuShell 侧初始化（本仓库 `nushell/config.nu` 已写入）：
 
-   - 将 `C:\Apps\WindowsTerminal\WindowsTerminal.exe` 替换为你的 Windows Terminal 的实际路径。
-   - 如果你没有指定默认配置文件名称，可以省略 `--profile "默认配置文件名称"` 部分。
-   - `-d "%V"` 表示在当前文件夹路径下打开终端。
-
-6. 返回到 `WindowsTerminal` 项，双击右侧窗口中的 `(默认)` 值，输入你希望在右键菜单中显示的名称，例如 `在终端中打开`。
-
-#### **添加图标（可选）**
-
-如果你想为右键菜单项添加图标，可以进行以下操作：
-
-1. 在 `WindowsTerminal` 项中，右键点击空白处，选择“新建” > “字符串值”，命名为 `Icon`。
-
-2. 双击 `Icon`，输入 Windows Terminal 的图标路径，例如：
-
-   ```
-   "C:\Apps\WindowsTerminal\WindowsTerminal.exe,0"
-   ```
-
-   这里的 `,0` 表示使用该程序的第一个图标。
-
-# 2. starship配置
-
-```lua
+```powershell
 mkdir ~/.cache/starship
 starship init nu | save -f ~/.cache/starship/init.nu
 ```
 
-路径：`~/.config/starship.toml`
-starship 的所有配置都在此 [TOML](https://github.com/toml-lang/toml) 文件中完成
+#### 3) NuShell
 
-> 我这里保持默认就行，不做配置
+- **源文件**：`nushell/config.nu`、`nushell/env.nu`
+- **目标位置（Windows）**：通常在 `~\AppData\Roaming\nushell\`
+  - 在 NuShell 中运行：`$nu.config-path` / `$nu.env-path` 可确认
 
+这份 `config.nu` 的关键点：
 
+- 启动 Starship：`use ~/.cache/starship/init.nu`
+- 主题配色（`$dark_theme` / `$light_theme`）与 `$env.config` 大量默认项
+- 代理函数：`proxy set / proxy unset / proxy check`（注意端口是 `7897`，与 PowerShell 默认不一样）
+- 一系列别名（`vim`、`l`、`ll` 等）
+- **引入补全脚本**：`source ~/AppData/Roaming/nushell/script/.../*-completions.nu`
 
+##### 自定义补全（nushell/script）
 
-# 3. yazi
+`nushell/script/` 下是按命令分目录的补全模块（如 `docker/`、`ssh/`、`git/`、`scoop/`、`winget/` 等）。
 
-[installation|Yazi](https://yazi-rs.github.io/docs/installation)
+- 总览说明见：`nushell/script/README.md`
+- 例如 ssh 补全会解析 `~/.ssh/config`（详见 `nushell/script/ssh/README.md`）
 
+#### 4) Neovim（LazyVim + Neovide 可选）
 
-在powershell配置文件中加入如下内容：
-```bash
-function y {  
-$tmp = [System.IO.Path]::GetTempFileName()  
-yazi $args --cwd-file="$tmp"  
-$cwd = Get-Content -Path $tmp -Encoding UTF8  
-if (-not [String]::IsNullOrEmpty($cwd) -and $cwd -ne $PWD.Path) {  
-Set-Location -LiteralPath ([System.IO.Path]::GetFullPath($cwd))  
-}  
-Remove-Item -Path $tmp  
-}
-```
-然后就可以使用`y`而不是`yazi`来启动，并按 退出q，
+- **目录**：`nvim/`
+- **目标位置（Windows）**：`%LOCALAPPDATA%\nvim`（示例：`C:\Users\用户名\AppData\Local\nvim`）
 
-# 4.nushell
+特点（按仓库实际配置）：
 
-路径：`nushell` 中执行 `echo $nu.config-path`
+- 插件按职责拆分：`lua/plugins/{core,ui,tools,lang,ai}`
+- Windows 下 Treesitter 编译器优先级：`clang > zig > gcc`
+- 输入法自动切英文（依赖 `im-select.exe`）：`lua/plugins/tools/ime.lua`
+- AI：
+  - Codex：`lua/plugins/ai/codex.lua`
+  - Claude Code：`lua/plugins/ai/claudecode.lua`（依赖系统能执行 `claude`）
 
-示例配置：
+更完整的安装、依赖与键位速查：`nvim/README.md`  
+插件索引：`nvim/lua/plugins/README.md`
 
-```lua
-# 启动starship
-use ~/.cache/starship/init.nu
+#### 5) Yazi
 
-# 删除欢迎语
-$env.config.show_banner = false
+- **目录**：`yazi/`
+- **目标位置（Windows）**：通常为 `~\AppData\Roaming\yazi\config\`（也可能是 `~\.config\yazi\`，按你的安装方式为准）
 
-$env.config.buffer_editor = "nvim"
+这份配置包含：
 
-# 定义别名和目录常量
-alias vim = nvim
+- `yazi.toml`：显示隐藏文件、排序、预览与 opener 规则等
+- `theme.toml`：`catppuccin-mocha` / `catppuccin-latte`
+- `keymap.toml`：较完整的默认键位映射（含 `zoxide`/`fzf` 插件入口）
+- `package.toml`：声明 catppuccin flavors 依赖
 
-# 设置代理
-# $env.HTTP_PROXY = ""
-def --env "proxy set" [] {
-    load-env { "HTTP_PROXY": "socks5://127.0.0.1:10808", "HTTPS_PROXY": "socks5://127.0.0.1:10808" }
-}
+#### 6) Windows Terminal 右键菜单
 
-proxy set
+- 文件：`add-wt-right-click.reg`
+- 作用：在**目录背景**右键添加 “Open with Terminal”
 
-def --env "proxy unset" [] {
-    load-env { "HTTP_PROXY": "", "HTTPS_PROXY": "" }
-}
+注意：该 `.reg` 内写死了 `wt.exe` 路径与图标路径（需按你本机实际路径修改后再导入）。
 
-def "proxy check" [] {
-    print "Try to connect to Google..."
-    let resp = (curl -I -s --connect-timeout 2 -m 2 -w "%{http_code}" -o /dev/null www.google.com)
-    
-    if $resp == "200" {
-        print "Proxy setup succeeded!"
-    } else {
-        print "Proxy setup failed!"
-    }
-}
-```
+### Hexo（博客配置）
 
+`hexo/_config.yml` 与 `hexo/_config.anzhiyu.yml` 是博客配置示例（主题 `anzhiyu`、菜单、展示与功能开关等）。  
+它更偏“站点私有配置”，通常不建议直接照搬到别人的站点，仅作为你自己的可复用模板。
 
+### 同步与更新
 
-# 5.neovim
+- **复制覆盖**：简单粗暴，适合首次快速落地
+- **符号链接（推荐）**：把系统配置目录指向本仓库文件，更新时只需要 `git pull`
 
-配置文件的存放地址：`C:\Users\用户\AppData\Local\nvim`
+Windows 下常用的链接方式（管理员或开发者模式视系统而定）：
 
-Lazyvim项目地址：[GitHub - LazyVim/LazyVim: Neovim config for the lazy](https://github.com/LazyVim/LazyVim?tab=readme-ov-file)
+- PowerShell：`New-Item -ItemType SymbolicLink ...`
+- CMD：`mklink` / `mklink /D`
 
-Lazyvim安装文档：[Fetching Title#cmv7](http://www.lazyvim.org/installation)
+### 常见问题（FAQ）
 
-
-
-# 6.RIME 输入法
-
-官方最新版本的小狼毫: https://github.com/rime/weasel/releases/latest
-
-默认情况下的配置文件(配置文件存放在配置目录下；如果不存在，可以手动创建)：
-
-| 文件                                                       | 注释                                               |
-| ---------------------------------------------------------- | -------------------------------------------------- |
-| default.custom.yaml                                        | 核心配置、全局配置                                 |
-| squirrel.custom.yaml / weasel.custom.yaml / ibus_rime.yaml | 平台相关配置。样式皮肤，不同软件默认输入法状态等。 |
-| <方案标识>.custom.yaml                                     | 输入方案的定制配置                                 |
-| <名称>.dict.yaml                                           | 词典                                               |
-| custom_phrase.txt                                          | 自定义短语                                         |
-
-**优先级**：输入方案的定制配置  > 核心配置、全局配置 > 系统自带的**default**.yaml
-
-
-
-下载配置模板：[薄荷输入法 – Oh-my-rime](https://github.com/Mintimate/oh-my-rime)
-
-该模板特点，已经配置：
-
-- 内置[雾凇拼音](https://github.com/iDvel/rime-ice)词典，并且仓库内的字典与雾凇拼音同步；
-- 已经配置好了水鸭青皮肤样式配置；
-- 内置三款输入法： 薄荷拼音（全拼）、地球拼音-薄荷定制和五笔98薄荷定制，方便不同小伙伴选择自己喜欢的输入方式；
-- 配置多款`lua`脚本： 支持输入`R`后输入数字，进行数字转换，支持输入`week`、`date`、`time`和`lunar`分别输入当前星期、日期、时间以及农历日期，以词定字等。
-- 支持中英混合输入、支持emoji输入、支持繁体输入等。
-
-只需要下载并移动文件到配置目录（用户文件夹），重新部署即可：
-
-![image-20250208094652740](./imgs/image-20250208094652740.png)
-
-详细的配置，可以查看：
-
-- [薄荷输入法 Oh-my-rime 官方文档: https://www.mintimate.cc](https://www.mintimate.cc/)
-
-
-
-通过东风破导入薄荷输入配置。东风破的前置条件：
-
-- 已经安装好 Git，并且配置到环境变量内；
-
-如果你是Windows用户，其实小狼毫已经自带一个半成品的东风破，你可以在小狼毫的`方案选单设定`中的`获取更多输入方案`内激活东风破：
-
-![image-20250208100042305](./imgs/image-20250208100042305.png)
-
-之后，在这个界面内，输入薄荷的配方：
-
-```
-Mintimate/oh-my-rime:plum/full
-```
-
-
-
-
-
-### 方案切换
-
-使用热键进行方案切换，热键默认是`Ctrl + ~`或`F4`：
-
-其中`F4`比较容易冲突，那么可以进行修改.
-直接配置`default.custom.yaml`里的`hotkeys`
-
-```yaml
-"switcher/hotkeys":
-  - "Control+grave"
-```
-
-![image-20250208095407909](./imgs/image-20250208095407909.png)
-
-### 配色样式
-
-`weasel.custom.yaml`只需要添加
-
-```yaml
-patch:
-  "style/color_scheme": mint_dark_green
-  
-  "style/horizontal": true #横向显示
-  "us_keyboard_layout": true
-  "style/display_tray_icon": true
-  "style/font_face": "PingFang"
-  "style/font_point": 10
-  "style/label_font_point": 6 # 候选词数字大小
-  "style/inline_preedit": false # 内嵌预编辑
-  "style/corner_radius": 20 # 窗口圆角半径
-  "style/layout/border": 0 # 窗口边界高度，大于圆角半径才有效果
-  "style/layout/border_width": 0 # 窗口边界宽度，大于圆角半径才有效果
-  "style/layout/candidate_spacing": 12
-  "style/layout/hilite_padding": 8
-  "style/layout/hilite_spacing": 3
-  "style/layout/margin_x": 8
-  "style/layout/margin_y": 8
-  "style/layout/round_corner": 7
-  "style/layout/spacing": 10
-
-```
-
-### 双拼编码自定义
-
-
-
-薄荷的默认配置，双拼的候选区编码是有做转换的，比如：小鹤双拼需要拼写`你好`，会出现`nihao`，而不是`nihc`：
-
-
-
-![image-20250208101216042](./imgs/image-20250208101216042.png)
-
-创建`double_pinyin_flypy.custom.yaml`文件：
-
-```yaml
-# Rime Custom
-# encoding: utf-8
-
-patch:
-  translator/preedit_format: []
-```
-
-之后，重新部署输入法，就可以看到双拼的编码了。
-
-
-
-### 输入符号
-
-default.custom.yaml
-
-```yaml
-patch:
-  punctuator/import_preset: symbols
-  recognizer/patterns/punct: '^/([0-9]0?|[A-Za-z]+)$'
-```
-
-![image-20250208104739040](./imgs/image-20250208104739040.png)
-
-![image-20250208104744387](./imgs/image-20250208104744387.png)
-
-![image-20250208104752187](./imgs/image-20250208104752187.png)
+- **NuShell 与 PowerShell 代理端口不一致**：PowerShell 默认 `7890`，NuShell 配置里是 `7897`，按你实际代理软件端口统一即可。
+- **Neovim Treesitter 编译失败**：优先确保 `clang` 可用（或按 `nvim/README.md` 的 Scoop 依赖安装），再在 Neovim 里执行 `:TSUpdate`、` :checkhealth nvim-treesitter`。
+- **终端图标乱码**：确认终端与编辑器都在用 Nerd Font。
 

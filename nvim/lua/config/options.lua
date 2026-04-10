@@ -142,6 +142,17 @@ if g.neovide then
   g.neovide_cursor_animate_in_insert_mode = true
   g.neovide_cursor_animate_command_line = false
 
+  -- 光标粒子特效（参考 fanlusky/FanyLazyvim options.lua）
+  -- 可选: "railgun" "torpedo" "pixiedust" "sonicboom" "ripple" "wireframe"
+  g.neovide_cursor_vfx_mode = "pixiedust"
+  g.neovide_cursor_vfx_particle_density = 100.0
+  g.neovide_floating_shadow = false
+  g.neovide_hide_mouse_when_typing = true
+
+  -- GUI 下光标形态：块状普通模式、插入竖条、无闪烁（与 FanyLazyvim 一致）
+  opt.guicursor =
+    "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait0-blinkoff0-blinkon0-Cursor/lCursor,sm:block-blinkwait0-blinkoff0-blinkon0"
+
   -- Win11 输入体验
   g.neovide_input_ime = true
   g.neovide_input_touch = false

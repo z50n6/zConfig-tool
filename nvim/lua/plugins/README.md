@@ -57,9 +57,12 @@
 - `ai/codex.lua`
   - 职责: Codex AI 面板与快捷键
   - 插件: `johnseth97/codex.nvim`
+- `ai/claudecode.lua`
+  - 职责: Claude Code IDE 集成（MCP 协议、diff、上下文）
+  - 插件: `coder/claudecode.nvim`（依赖 `folke/snacks.nvim`）
 
 ## Keymaps 补充
 
 - `lua/config/keymaps.lua`
   - `gd`: 使用 Telescope 跳转定义并设置 `reuse_win = false`
-  - `<leader>li`: 快速打开 `:LspInfo`，便于排查 LSP 环境与 attach 状态
+  - `<leader>li`: `:checkhealth vim.lsp`（Neovim 0.11+ 下 `:LspInfo` 可能不可用）

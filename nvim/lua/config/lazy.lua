@@ -48,7 +48,11 @@ require("lazy").setup({
         "gzip",
         -- "matchit",
         -- "matchparen",
-        -- "netrwPlugin",
+        -- 你已使用 Snacks Explorer 作为文件管理器，禁用 netrw 相关减少启动期开销
+        "netrw",
+        "netrwPlugin",
+        "netrwSettings",
+        "netrwFileHandlers",
         "tarPlugin",
         "tohtml",
         "tutor",

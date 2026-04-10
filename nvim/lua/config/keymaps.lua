@@ -128,7 +128,14 @@ end, opts("查看当前诊断"))
 map("n", "<leader>lf", function()
   vim.lsp.buf.format({ async = true })
 end, opts("LSP 格式化当前文件"))
-map("n", "<leader>li", "<cmd>LspInfo<cr>", opts("LSP 状态信息"))
+-- Neovim 0.11+ 内置 :lsp 时 nvim-lspconfig 可能不注册 :LspInfo（E492），用官方健康检查替代
+map("n", "<leader>li", "<cmd>checkhealth vim.lsp<cr>", opts("LSP 状态 (:checkhealth vim.lsp)"))
+map("n", "<leader>ls", with_telescope(function(builtin)
+  builtin.lsp_document_symbols()
+end), opts("LSP Symbols"))
+map("n", "<leader>lS", with_telescope(function(builtin)
+  builtin.lsp_workspace_symbols()
+end), opts("LSP Workspace Symbols"))
 
 -- 全选（Normal / Insert / Visual）
 map("n", "<C-a>", "ggVG", opts("全选"))
@@ -392,3 +399,23 @@ map("n", "<leader>rc", '<cmd>TermExec cmd="cmake -P %"<cr>', opts("运行当前 
 map("n", "<leader>ru", '<cmd>TermExec cmd="cargo run"<cr>', opts("运行 Cargo 项目"))
 map("n", "<leader>rg", '<cmd>TermExec cmd="go run %"<cr>', opts("运行当前 Go 文件"))
 map("n", "<leader>rk", stop_all_toggleterm_jobs, opts("停止终端运行任务"))
+
+-- LazyVim/Snacks 默认键：合并时 `keys = { lhs, false }` 可能无效，在此强制删除
+local function del_lazyvim_unwanted_defaults()
+  pcall(vim.keymap.del, "n", "<leader>fb")
+  pcall(vim.keymap.del, "n", "<leader>fB")
+  -- 与自定义分屏冲突（见本文件 ss/sv/sh/...）
+  pcall(vim.keymap.del, "n", "<leader>-")
+  pcall(vim.keymap.del, "n", "<leader>|")
+  -- Snacks 草稿缓冲已迁到 `<leader>bS` / `<leader>b.`
+  pcall(vim.keymap.del, "n", "<leader>S")
+  pcall(vim.keymap.del, "n", "<leader>.")
+  -- Grep Root Dir 与 `<leader>sg` 相同，去掉 `<leader>/`
+  pcall(vim.keymap.del, "n", "<leader>/")
+  -- LSP symbols 迁移到 `<leader>ls` / `<leader>lS`
+  pcall(vim.keymap.del, "n", "<leader>ss")
+  pcall(vim.keymap.del, "n", "<leader>sS")
+end
+vim.schedule(del_lazyvim_unwanted_defaults)
+vim.defer_fn(del_lazyvim_unwanted_defaults, 100)
+vim.defer_fn(del_lazyvim_unwanted_defaults, 500)

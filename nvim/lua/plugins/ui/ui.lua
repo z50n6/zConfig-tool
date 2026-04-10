@@ -18,6 +18,7 @@ return {
   { import = "lazyvim.plugins.extras.editor.snacks_explorer" },
   {
     "folke/noice.nvim",
+    event = "VeryLazy",
     opts = function(_, opts)
       opts.routes = opts.routes or {}
 
@@ -175,6 +176,7 @@ return {
   },
   {
     "nvim-mini/mini.icons",
+    event = "VeryLazy",
     opts = function(_, opts)
       opts.file = vim.tbl_deep_extend("force", opts.file or {}, {
         [".prettierrc"] = { glyph = "", hl = "MiniIconsPurple" },
@@ -189,6 +191,7 @@ return {
   },
   {
     "lewis6991/gitsigns.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     opts = {
       current_line_blame = false,
       preview_config = {
@@ -198,6 +201,32 @@ return {
   },
   {
     "folke/snacks.nvim",
+    -- 原 `<leader>,` 的 Snacks 缓冲列表已关掉；缓冲列表改由 Telescope `<leader>bf`（见 telescope.lua）
+    keys = {
+      { "<leader>,", false },
+      -- Grep 根目录：与 LazyVim `<leader>sg` 相同，去掉重复的 `<leader>/`
+      { "<leader>/", false },
+      -- 分屏改用 keymaps.lua 中 ss/sv 等；去掉 LazyVim/Snacks 默认
+      { "<leader>-", false },
+      { "<leader>|", false },
+      -- 草稿缓冲迁到 `<leader>b`（原 `<leader>S` / `<leader>.`）
+      { "<leader>S", false },
+      { "<leader>.", false },
+      {
+        "<leader>bS",
+        function()
+          Snacks.scratch.select()
+        end,
+        desc = "选择草稿缓冲 (Snacks)",
+      },
+      {
+        "<leader>b.",
+        function()
+          Snacks.scratch()
+        end,
+        desc = "切换草稿缓冲 (Snacks)",
+      },
+    },
     opts = function(_, opts)
       opts.explorer = opts.explorer or {}
       opts.indent = opts.indent or {}
