@@ -1,0 +1,734 @@
+ll
+ls
+whoami
+ls
+config nu
+echo $nu.config-path
+git clone https://github.com/nushell/nu_scripts.git
+config nu
+ls
+source   ~/AppData/Roaming/nushell/script/bat/bat-completions.nu
+source   ~/AppData/Roaming/nushell/script/cargo/cargo-completions.nu
+source   ~/AppData/Roaming/nushell/script/curl/curl-completions.nu
+source   ~/AppData/Roaming/nushell/script/docker/docker-completions.nu
+source   ~/AppData/Roaming/nushell/script/git/git-completions.nu
+source   ~/AppData/Roaming/nushell/script/make/make-completions.nu
+source   ~/AppData/Roaming/nushell/script/mysql/mysql-completions.nu
+source   ~/AppData/Roaming/nushell/script/npm/npm-completions.nu
+source   ~/AppData/Roaming/nushell/script/ssh/ssh-completions.nu
+source   ~/AppData/Roaming/nushell/script/tar/tar-completions.nu
+source   ~/AppData/Roaming/nushell/script/tcpdump/tcpdump-completions.nu
+source   ~/AppData/Roaming/nushell/script/winget/winget-completions.nu
+source   ~/AppData/Roaming/nushell/script/yarn/yarn-v4-completions.nu
+
+
+
+
+
+
+
+
+
+
+
+config nu
+docker commit 
+starship preset nerd-font-symbols -o ~/.config/starship.toml
+ls
+cd d:
+cd D:
+cd d
+d:
+ls
+pwd
+whoami
+ls
+ll
+ls
+vim starship.toml
+ls
+whoami
+pwd
+ls
+vim starship.toml
+ls
+vim starship.toml
+ls
+starship preset pastel-powerline -o ~/.config/starship.toml
+ls
+cd D:\Document\
+ls
+cd The-Road-to-Safety\
+ls
+pwd
+ls
+s
+ls
+whoami
+pwd
+ls
+cd ..
+ls
+cd The-Road-to-Safety\
+ls
+exec nyu
+ls
+pwd
+ls
+cd D:\Code\python\
+ls
+cd ..
+ls
+cd Go\
+ls
+cd Go_Safe\
+ls
+cd ../../python/
+ls
+cd ..
+ls
+ll
+cd D:\Code\python\
+ls
+whoami
+pwd
+nvim *
+nvim CVE-2023-33246.py
+ls
+l
+ls
+lss
+ls
+whoami
+ls
+whoami
+pwd
+lls
+pwd
+ls
+ll
+ls
+whoami
+ls
+pwd
+cd D:\Code\python\
+ls
+s
+ls
+pwd
+ls
+cd 
+ls
+cd ~
+ls
+cd d:\Code\python\
+ls
+pwd
+ls
+cd ~
+ls
+whoami
+pwd
+ls
+pwd
+ls
+l
+ls
+pwd
+ls
+cd ~
+ls
+pwd
+cd D:\Code\python\
+ls
+cd ~
+ls
+cd -
+ls
+cd ~
+ls
+whoami
+pwd
+cd D:\Code\python\
+ls
+cd ~
+ls
+cd ~
+ls
+pwd
+ls
+cd ~
+ls
+cd D:\Code\python\
+ls
+cd ~
+ls
+cd ..
+ls
+ra
+ls
+cd ~<\n>ls
+cd ~
+ls
+pwd
+cd D:\Code\python\
+ls
+pwd
+ls
+cd ~
+ls
+whoami
+pwd
+ls
+whoami
+ls
+pwd
+cd D:\Code\python\
+ls
+cd ~
+ls
+cd ~
+ls
+pwd
+whoami
+cd D:\Code\python\
+ls
+cd D:\Document\The-Road-to-Safety\
+ls
+cd D:\Code\python\
+ls
+cd D:\Document\The-Road-to-Safety\
+cd ~
+ls
+cd ~/.config/wezterm/
+ls
+cd -
+ls
+cd D:\Code\python\
+ls
+cd ~/.config/wezterm/
+ls
+pwd
+ls
+cd ~
+ls
+wohami
+pwd
+cd D:\Code\python\
+ls
+whoami
+ls
+whoami
+ls
+whoami
+sys
+sys cpu
+cd ~
+ls
+pwd
+whoami
+ls
+python
+ls
+pwd
+whoami
+ls
+cd D:\Code\python\
+ls
+cd ~<\n>ls
+ls
+cd D:\Code\python\
+ls
+pwd
+whoami
+cd ~
+ls
+pwd
+cd D:\Code\python\
+ls
+cd ~
+ls
+cd D:\Code\python\
+cd ~/.config/wezterm/
+ls
+cd config\
+vim launch.lua
+ls
+config nu
+cs4.7
+ls
+cs4.7
+ls
+config nu
+ls
+config nu
+cobaltstrike 
+ls
+cobaltstrike 
+ls
+onefox 
+ls
+cobaltstrike 
+onefox 
+ls
+mitan 
+onefox 
+ls
+cobaltstrike 
+cd D:\Penetration\RedTeam\Post-Exploitation\Lateral_Movement\impacket-0.11.0\examples
+ls
+python3 atexec.py -h
+ls
+cd ../../
+ls
+cd impacket-0.12.0\
+ls
+cat README.md
+python3 -m pipx install .
+cat README.md
+ls
+python3 -m pip3 install .
+python3 -m pip install .
+cd build\scripts-3.12\
+ls
+python3 atexec.py -h
+python3 atexec.py ./administrator:admin!@#45@192.168.3.32 "ver"
+ls
+python3 atexec.py --hashes :518b98ad4178a53695dc997aa02d455c   ./administrator@192.168.3.32 "whoami"
+python3 atexec.py --hashes :518b98ad4178a53695dc997aa02d455c   ./administrator@192.168.3.21 "whoami"
+ls
+python3 atexec.py --hashes :518b98ad4178a53695dc997aa02d455c   ./administrator@192.168.3.32 "whoami"
+python3 atexec.py -hashes :518b98ad4178a53695dc997aa02d455c   ./administrator@192.168.3.32 "whoami"
+ls
+ls |<\n>ls
+ls
+confnig nu
+config nu
+ls
+lllls
+ls
+lllllll
+ls
+llllls
+ls
+whoami
+ls
+pwd
+ls
+whoami
+pwd
+ls
+ll
+ls
+ll
+ls
+ll
+pwd
+ll
+cd D:\Penetration\RedTeam\Post-Exploitation\Lateral_Movement\impacket-0.11.0\examples
+ls
+ll
+ls
+ll
+ls
+ll
+ls
+whoami
+pwd
+ll
+ls
+ll
+ls
+ll
+ls
+whoami
+pwd
+ls
+ll
+pwd
+ll
+ls
+ll
+cd D:\Document\The-Road-to-Safety\
+ls
+ll
+pwd
+ls
+history
+ls
+fzf
+lls
+ls
+pwd
+ls
+ll
+nvim main.go
+s
+ls
+rm main.go
+ls
+cd D:\Code\Go\
+ls
+nvim Go_Safe\
+ls
+git clone https://github.com/LazyVim/starter $env:LOCALAPPDATA\nvim
+ls
+cd AppData\
+git clone https://github.com/LazyVim/starte 
+git clone https://github.com/LazyVim/starter 
+mv starter\ nvim
+ls
+git clone https://github.com/astral-sh/ruff-lsp.git
+git clone https://github.com/microsoft/debugpy.git
+git clone https://github.com/PyCQA/isort.giy
+git clone https://github.com/PyCQA/isort.git
+vim
+cd D:\Code\
+vim
+ls
+nvim *
+nvim python\
+ls
+nvim
+exit
+exit
+nvim test.py
+cd ~/AppData/Local/nvim/
+ls
+cd lua\
+ls
+cd ..
+ls
+cd ..
+ls
+nvim nvim\
+cd D:\Code\python\
+ls
+vim test.py
+nvim
+ls
+whoami
+cd D:\Code\python\
+vim test.py
+vim
+ls
+cd ~/AppData/Local/nvim/
+ls
+vim .
+vim 
+nvim
+cd D:\Code\python\
+nvim test.py
+vim ~/AppData/Local/nvim/
+vim test.py
+vim ~/AppData/Local/nvim/
+vim test.py
+vim ~/AppData/Local/nvim/
+vim
+ls
+cd ~/AppData/Roaming/nushell/
+ls
+vim config.nu
+ls
+cd -
+ls
+ll
+nvim
+python3 test.py
+ls
+cls
+whoami
+pwd
+whoami
+cls
+nvim
+cd D:\Code\python\
+vim test.py
+ls
+vim phpinfo_include.py
+vim demo.py
+python3 test.py
+exit
+vim test.py
+vim
+ls
+csl
+pwd
+cls
+whoami
+pwd
+python3 test.py
+exit
+vim test.py
+nvim
+vim test.py
+ls
+whoami
+ls
+sys
+?
+help
+ps 
+help
+ps | where cpu >0
+ps 
+top
+ps 
+ls
+vim
+ls
+whoami
+pwd
+ls
+cls
+pwd
+exit
+vim
+cd D:\Code\python\
+vim test.py
+cd D:\Document\The-Road-to-Safety\
+vim >*
+vim *
+vim
+ls
+pwd
+whoami
+ls
+sys
+sys cpu
+sys disks
+vim
+ls
+ls |  grep colori
+ls
+git clone https://github.com/PyCQA/isort.git
+git clone https://github.com/microsoft/debugpy.git
+rm debugpy\
+rm -rf debugpy\
+git clone https://github.com/microsoft/debugpy.git
+git clone https://github.com/astral-sh/ruff-lsp.git
+rm -rf  ruff-lsp\
+git clone https://github.com/astral-sh/ruff-lsp.git
+ls
+rm -rf  ruff-lsp\
+ls
+vim
+vim 
+vim
+exit
+cd D:\Code\python\
+vim demo1.py
+vim
+vim test.py
+vim
+ls
+vim test.py
+vim
+ls
+vim
+vim
+ls
+whoami
+ls
+vim C:/Users/Z/AppData/Local/nvim-data/lazy/conform.nvim
+exit
+vim
+exit
+vim
+cd D:\Code\Go\
+vim *
+vim .
+vim
+vim main.go
+vim
+vim main.go
+ls
+vim
+vim 
+vim main.go
+vim main.go
+vim
+vim 
+exit
+exit
+vim
+vim ~/AppData/Local/nvim/
+vim
+cd D:\Code\python\
+ls
+whaomi
+wpd
+exit
+vim test.py
+vim ~/AppData/Local/nvim/
+vim test.py
+ls
+exit
+vim ~/AppData/Local/nvim/
+vim
+vim test.py
+vim ~/AppData/Local/nvim/
+vim
+vim 
+vim
+cd D:\Code\Go\
+vim .
+vim
+vim main.go
+ls
+vim
+ls
+vim D:\Code\Go\
+ls
+vim ~/AppData/Local/nvim/
+vim vim.txt
+ls
+cd vulhub\
+ls
+cd ..
+ls
+vim
+ls
+vim
+ls
+vim
+ls
+vim
+ls
+vim
+ls
+vim
+ls
+vim
+ls
+vim
+ls
+vim
+exit
+cd  ~/AppData/Local/nvim/
+vim .
+vim
+ls
+cd ..
+ls
+mv nvim\  nvim-bak
+cd ~/AppData/Roaming/nushell/
+cd ~/AppData/Local/
+mv nvim\  nvim-bak
+rm -rf nvim-data\
+mv ~/Downloads/nvim-main/  .
+ls
+mv nvim-main\  nvim
+ls
+vim
+cd D:\Code\Go\
+vim
+cd D:\Code\Go\
+vin .
+go run main.go
+vim .
+go run crybto.go
+ls
+cls
+clear
+cd D:\Code\Go\
+cd ~/AppData/Local/nvim/
+cd ..
+vim nvim\
+vim
+vim nvim\
+exit
+vim
+vim nvim\
+ls
+vim
+vim nvim\
+vim
+vin nvim\
+vinm nvim\
+vim nvim\
+vim
+cd D:\Code\Go\
+nvim .
+ls
+vim
+ls
+vim
+vim ~/AppData/Local/nvim/
+vim
+vim ~/AppData/Local/nvim/
+vim
+vim ~/AppData/Local/nvim/
+ls
+vim
+vim ~/AppData/Local/nvim/
+vim
+ls
+cd D:\Code\Go\
+vim .
+ls
+vim ~/AppData/Local/nvim/
+vim
+vim ~/AppData/Local/nvim/
+vim
+ls
+vim
+cd D:\Code\Go\
+vin .
+vim .
+ls
+vim main.go
+ls
+vim
+vim ~/AppData/Local/nvim/
+ls
+vim
+cd D:\Code\Go\
+go run main.go
+cls
+exit
+vim .
+ls
+mkdir GoDemo
+vim GoDemo\
+vim ~/AppData/Local/nvim/
+vim GoDemo\
+pwd
+sys disks
+ls
+cd D:\Code\Go\
+vim GoDemo\
+vim
+vim GoDemo\
+vim
+vim GoDemo\
+exit
+cd D:\Code\Go\
+vim
+vim Go_Safe\
+mkdir winterminal-config
+cd winterminal-config\
+git init
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/hxysaury/winterminal-config.git
+cd ~/.cache/starship/
+starship init nu | save -f init.nu
+ls
+exit
+ls
+whoami
+pwd
+ls
+exit
+ls
+nvim
+ls
+rm
+rm -rf
+rm -h
+exit
+echo $nu.config-path
+start 
+start  $nu.config-path
+code  $nu.config-path
