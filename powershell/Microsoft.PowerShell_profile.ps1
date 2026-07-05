@@ -3,7 +3,7 @@
 Set-StrictMode -Version Latest
 # ==========================
 # PowerShell 7.6 高颜值开发版 Profile
-# 适配：Terminal-Icons / posh-git / PSReadLine / PSFzf / zoxide / Neovim / oh-my-posh(amro)
+# 适配：Terminal-Icons / posh-git / PSReadLine / fzf / zoxide / Neovim / starship / oh-my-posh(amro)
 # 文件：D:\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
 # 目标：稳定、好看、好用，且每一段都便于后续维护
 # ==========================
@@ -61,253 +61,18 @@ function Import-ModuleSafely {
     return $false
 }
 
-# ---------- 2.1 命令不存在时给出安装建议 ----------
-# 类似 Linux 的 command-not-found：在报错后补充 winget / scoop / choco / npm 安装提示。
-$script:CommandNotFoundHintCache = @{}
-
-function Get-CommandNotFoundInstallHints {
-    param([Parameter(Mandatory)][string]$CommandName)
-
-    if ($script:CommandNotFoundHintCache.ContainsKey($CommandName)) {
-        return $script:CommandNotFoundHintCache[$CommandName]
-    }
-
-    $hints = [System.Collections.Generic.List[string]]::new()
-
-    function Add-Hint {
-        param([string]$Value)
-        if ($Value -and -not $hints.Contains($Value)) {
-            $hints.Add($Value) | Out-Null
-        }
-    }
-
-    function Get-SearchCandidates {
-        param([string]$Name)
-
-        $list = [System.Collections.Generic.List[string]]::new()
-        $commonPrefixes = @('get', 'set', 'new', 'remove', 'install', 'start', 'stop', 'open')
-
-        function Add-Candidate {
-            param([string]$Value)
-            if (-not [string]::IsNullOrWhiteSpace($Value) -and -not $list.Contains($Value)) {
-                $list.Add($Value) | Out-Null
-            }
-        }
-
-        Add-Candidate $Name
-
-        $base = [IO.Path]::GetFileNameWithoutExtension($Name)
-        Add-Candidate $base
-        $parts = $base -split '[-_\.]'
-
-        if ($parts.Count -ge 2) {
-            if ($parts[-1].Length -ge 3) { Add-Candidate ($parts[-1]) }
-            Add-Candidate (($parts[1..($parts.Count - 1)] -join '-'))
-        }
-
-        foreach ($prefix in $commonPrefixes) {
-            if ($base -match "^$prefix[-_](.+)$") {
-                Add-Candidate $matches[1]
-            }
-        }
-
-        foreach ($part in $parts) {
-            if ($part.Length -ge 3 -and $part -notin $commonPrefixes) {
-                Add-Candidate $part
-            }
-        }
-
-        return @($list)
-    }
-
-    function Get-FirstDataLine {
-        param([string[]]$Lines)
-
-        $seenDivider = $false
-        foreach ($line in $Lines) {
-            if (-not $line) { continue }
-            $plain = ([regex]::Replace($line, "`e\[[\d;]*m", '')).Trim()
-            if (-not $plain) { continue }
-
-            if ($plain -match '^(Name|名称)\s{2,}' -or $plain -match '^----') {
-                $seenDivider = $true
-                continue
-            }
-
-            if ($plain -match '^(Results from|The following source|Found|No package found|没有找到)') { continue }
-            if ($plain -match '^(WARN|WARNING)\s') { continue }
-            if ($plain -match '^[\\/\-\|\s]+$') { continue }
-            if ($plain -match '^\d+%$') { continue }
-            if ($plain -match 'KB / ' -or $plain -match 'MB / ') { continue }
-
-            if ($seenDivider) { return $plain }
-        }
-
-        return $null
-    }
-
-    function Normalize-MatchText {
-        param([string]$Value)
-        if ([string]::IsNullOrWhiteSpace($Value)) { return '' }
-        return (($Value.ToLowerInvariant() -replace '\.(exe|cmd|bat|ps1)$', '') -replace '[^a-z0-9]+', '')
-    }
-
-    function Test-HighConfidencePackageMatch {
-        param(
-            [string]$Candidate,
-            [string]$PackageName,
-            [string]$PackageId
-        )
-
-        $candidateNorm = Normalize-MatchText $Candidate
-        $nameNorm = Normalize-MatchText $PackageName
-        $idNorm = Normalize-MatchText $PackageId
-        $idLeafNorm = Normalize-MatchText (($PackageId -split '\.')[-1])
-
-        if (-not $candidateNorm) { return $false }
-
-        return (
-            $nameNorm -eq $candidateNorm -or
-            $idNorm -eq $candidateNorm -or
-            $idLeafNorm -eq $candidateNorm -or
-            $nameNorm.StartsWith($candidateNorm) -or
-            $idLeafNorm.StartsWith($candidateNorm)
-        )
-    }
-
-    $candidates = Get-SearchCandidates $CommandName
-
-    if (Get-Command winget -ErrorAction SilentlyContinue) {
-        foreach ($candidate in $candidates) {
-            try {
-                $line = Get-FirstDataLine @(winget search --source winget --disable-interactivity --accept-source-agreements $candidate 2>$null)
-                $id = $null
-                $name = $null
-                if ($line) {
-                    $parts = @($line -split '\s+' | Where-Object { $_ })
-                    $name = if ($parts.Count -ge 1) { $parts[0].Trim() } else { $null }
-                    $id = if ($parts.Count -ge 2) { $parts[1].Trim() } else { $null }
-                    if (-not $id -and $line -match '^(.+?)\s{2,}([^\s]+)\s{2,}(.+)$') {
-                        $name = $matches[1].Trim()
-                        $id = $matches[2].Trim()
-                    }
-                }
-                if ($id -and (Test-HighConfidencePackageMatch -Candidate $candidate -PackageName $name -PackageId $id)) {
-                    Add-Hint "winget install --id $id -e"
-                    break
-                }
-            } catch {}
-        }
-    }
-
-    if (Get-Command scoop -ErrorAction SilentlyContinue) {
-        foreach ($candidate in $candidates) {
-            try {
-                $searchResult = @(& scoop search $candidate 2>$null 3>$null 4>$null 5>$null 6>$null)
-                $pkg = $null
-                if ($searchResult.Count -gt 0) {
-                    if ($searchResult[0] -is [psobject] -and $searchResult[0].PSObject.Properties['Name']) {
-                        $pkg = [string]$searchResult[0].Name
-                    } else {
-                        $line = Get-FirstDataLine $searchResult
-                        if ($line -and $line -match '^([^\s]+)\s{2,}') {
-                            $pkg = $matches[1].Trim()
-                        }
-                    }
-                }
-                if ($pkg -and (Test-HighConfidencePackageMatch -Candidate $candidate -PackageName $pkg -PackageId $pkg)) {
-                    Add-Hint "scoop install $pkg"
-                    break
-                }
-            } catch {}
-        }
-    }
-
-    if (Get-Command choco -ErrorAction SilentlyContinue) {
-        foreach ($candidate in $candidates) {
-            try {
-                $line = @(& choco search $candidate --limit-output 2>$null 3>$null 4>$null 5>$null 6>$null | Select-Object -First 1)
-                if ($line -and $line[0] -match '^([^|]+)\|') {
-                    $pkg = $matches[1].Trim()
-                    if (Test-HighConfidencePackageMatch -Candidate $candidate -PackageName $pkg -PackageId $pkg) {
-                        Add-Hint "choco install $pkg -y"
-                        break
-                    }
-                }
-            } catch {}
-        }
-    }
-
-    if (Get-Command npm -ErrorAction SilentlyContinue) {
-        foreach ($candidate in $candidates) {
-            try {
-                $pkg = npm view $candidate name --silent 2>$null
-                if ($LASTEXITCODE -eq 0 -and $pkg) {
-                    Add-Hint "npm i -g $($pkg.Trim())"
-                    break
-                }
-            } catch {}
-        }
-    }
-
-    $nearby = @(Get-Command "*$CommandName*" -ErrorAction SilentlyContinue |
-        Select-Object -ExpandProperty Name -Unique |
-        Select-Object -First 5)
-
-    $result = [pscustomobject]@{
-        Hints  = @($hints)
-        Nearby = @($nearby)
-    }
-
-    $script:CommandNotFoundHintCache[$CommandName] = $result
-    return $result
-}
-
-function Show-CommandNotFoundGuidance {
-    param([Parameter(Mandatory)][string]$CommandName)
-
-    $displayName = $CommandName
-    if ($displayName -match '^(get|set|new|remove|install|start|stop|open)-(.+)$') {
-        $displayName = $matches[2]
-    }
-
-    $message = "$displayName : The term '$displayName' is not recognized as a name of a cmdlet, function, script file, or executable program."
-    Write-Host $message -ForegroundColor Red
-    Write-Host "Check the spelling of the name, or if a path was included, verify that the path is correct and try again." -ForegroundColor Red
-
-    $info = Get-CommandNotFoundInstallHints -CommandName $displayName
-
-    if ($info.Nearby.Count -gt 0) {
-        Write-Host ''
-        Write-Host '相近的本地命令：' -ForegroundColor Yellow
-        foreach ($item in $info.Nearby) {
-            Write-Host "  - $item" -ForegroundColor DarkYellow
-        }
-    }
-
-    if ($info.Hints.Count -gt 0) {
-        Write-Host ''
-        Write-Host '可尝试的安装命令（按当前环境自动探测）：' -ForegroundColor Cyan
-        foreach ($hint in $info.Hints) {
-            Write-Host "  $hint" -ForegroundColor DarkCyan
-        }
-    } else {
-        Write-Host ''
-        Write-Host '未找到直接安装提示，可手动搜索：' -ForegroundColor DarkGray
-        if (Get-Command winget -ErrorAction SilentlyContinue) { Write-Host "  winget search $displayName" -ForegroundColor DarkGray }
-        if (Get-Command scoop  -ErrorAction SilentlyContinue) { Write-Host "  scoop search $displayName"  -ForegroundColor DarkGray }
-        if (Get-Command choco  -ErrorAction SilentlyContinue) { Write-Host "  choco search $displayName"  -ForegroundColor DarkGray }
-        if (Get-Command npm    -ErrorAction SilentlyContinue) { Write-Host "  npm search $displayName"    -ForegroundColor DarkGray }
-    }
-}
-
 # 统一保存环境探测结果，后面各模块直接复用。
 $script:IsInteractive = Test-InteractiveHost
 $script:HasVT = Test-VTSupport
 
-# 原始主题路径配置（已停用，保留便于回滚）
-# $script:ThemePath = if ($env:POSH_THEMES_PATH) { Join-Path $env:POSH_THEMES_PATH 'amro.omp.json' } else { $null }
-$script:ThemePath = 'D:\Documents\PowerShell\themes\amro-custom.omp.json'
+# 动态查找 oh-my-posh 主题路径，避免 scoop 版本号硬编码。
+$script:ThemePath = if ($env:POSH_THEMES_PATH) {
+    Join-Path $env:POSH_THEMES_PATH 'amro.omp.json'
+} else {
+    $scoopThemes = Get-ChildItem -Path "$env:USERPROFILE\scoop\apps\oh-my-posh\*\themes\amro.omp.json" -ErrorAction SilentlyContinue |
+        Sort-Object -Descending | Select-Object -First 1
+    if ($scoopThemes) { $scoopThemes.FullName } else { $null }
+}
 $script:OhMyPoshLoaded = $false
 $script:PromptTheme = if ($env:USE_PROMPT_THEME) { $env:USE_PROMPT_THEME.ToLowerInvariant() } else { 'starship' }
 
@@ -339,36 +104,12 @@ if ($script:IsInteractive) {
         }
     }
 }
-if ($script:IsInteractive) {
-    $ExecutionContext.InvokeCommand.CommandNotFoundAction = {
-        param($CommandName, $EventArgs)
-
-        $missingName = $CommandName
-        $EventArgs.StopSearch = $true
-        $EventArgs.CommandScriptBlock = {
-            param(
-                [Parameter(ValueFromPipeline = $true)]
-                $InputObject,
-
-                [Parameter(ValueFromRemainingArguments = $true)]
-                $RemainingArgs
-            )
-
-            begin {}
-            process {}
-            end {
-            Show-CommandNotFoundGuidance -CommandName $missingName
-            }
-        }.GetNewClosure()
-    }
-}
 
 # ---------- 3. 常用模块加载 ----------
-# 图标增强、Git 状态、命令行编辑、FZF 模糊搜索。
+# 图标增强、Git 状态、命令行编辑。
 Import-ModuleSafely Terminal-Icons | Out-Null
 Import-ModuleSafely posh-git       | Out-Null
 Import-ModuleSafely PSReadLine     | Out-Null
-Import-ModuleSafely PSFzf          | Out-Null
 
 # 目录跳转优先使用 zoxide；如果没装 zoxide，再退回 PowerShell 的 z 模块。
 $script:HasZoxide = [bool](Get-Command zoxide -ErrorAction SilentlyContinue)
@@ -431,7 +172,7 @@ if ($script:IsInteractive -and (Get-Module PSReadLine)) {
     Set-PSReadLineKeyHandler -Key UpArrow   -Function HistorySearchBackward
     Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
-    # Tab 使用菜单补全；Ctrl+f / Ctrl+r 交给 FZF。
+    # Tab 使用菜单补全；Ctrl+f/Ctrl+r 交给 FZF。
     Set-PSReadLineKeyHandler -Key Tab        -Function MenuComplete
     Set-PSReadLineKeyHandler -Chord 'Ctrl+d' -Function DeleteChar
     Set-PSReadLineKeyHandler -Chord 'Ctrl+w' -Function BackwardDeleteWord
@@ -443,12 +184,41 @@ if ($script:IsInteractive -and (Get-Module PSReadLine)) {
     Set-PSReadLineKeyHandler -Chord 'Alt+f'  -Function ForwardWord
 }
 
-# ---------- 6. PSFzf：模糊搜索增强 ----------
-# Ctrl+f 搜索文件，Ctrl+r 模糊搜索历史命令。
-if ($script:IsInteractive -and (Get-Module PSFzf)) {
-    Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+f' -PSReadlineChordReverseHistory 'Ctrl+r'
+# ---------- 6. FZF 模糊搜索 ----------
+# 直接调用 fzf.exe（无需 PSFzf 模块）：
+#   Ctrl+f → 搜索文件/目录    Ctrl+r → 模糊搜索命令历史
+if ($script:IsInteractive -and (Get-Command fzf -ErrorAction SilentlyContinue)) {
+    # Ctrl+f: 使用 fd（更快）或 Get-ChildItem 搜索文件/目录
+    $script:__HasFd = [bool](Get-Command fd -ErrorAction SilentlyContinue)
+    Set-PSReadLineKeyHandler -Chord 'Ctrl+f' -ScriptBlock {
+        $result = if ($script:__HasFd) {
+            fd --hidden --follow --exclude .git 2>$null | fzf 2>$null
+        } else {
+            Get-ChildItem -Recurse -Depth 3 -ErrorAction SilentlyContinue |
+                ForEach-Object { $_.FullName } |
+                fzf 2>$null
+        }
+        if ($result) {
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert($result)
+        }
+    }
 
-    # 更简洁的 fzf 样式：轻边框、低饱和配色、减少装饰符号。
+    # Ctrl+r: 从持久化历史文件中模糊搜索历史命令
+    Set-PSReadLineKeyHandler -Chord 'Ctrl+r' -ScriptBlock {
+        $historyFile = (Get-PSReadLineOption).HistorySavePath
+        $selected = if ($historyFile -and (Test-Path $historyFile)) {
+            Get-Content $historyFile -ErrorAction SilentlyContinue |
+                Where-Object { $_ } |
+                Select-Object -Unique |
+                fzf --tac 2>$null
+        }
+        if ($selected) {
+            [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert($selected.Trim())
+        }
+    }
+
+    # FZF 样式：轻边框、低饱和配色
     $env:FZF_DEFAULT_OPTS = '--height=40% --layout=reverse --border=rounded --margin=0,1 --padding=0 --info=inline-right --prompt="› " --pointer="›" --marker="•" --separator=" " --scrollbar="│" --color=fg:#c0caf5,bg:-1,hl:#7aa2f7,fg+:#e5e9f0,bg+:#24283b,hl+:#7aa2f7,info:#6b7280,prompt:#9aa5ce,pointer:#9aa5ce,marker:#9ece6a,spinner:#9aa5ce,header:#6b7280,query:#c0caf5,border:#414868'
 }
 
@@ -467,10 +237,7 @@ if (Get-Module posh-git) {
     $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
 }
 
-# ---------- 9. 回退提示符 ----------
-# 已禁用自定义 prompt，交给 starship 或宿主默认提示符处理。
-
-# ---------- 10. 常用别名 ----------
+# ---------- 9. 常用别名 ----------
 # 保持 Linux 风格使用习惯，并把 vim 指向 nvim。
 Set-Alias grep Select-String
 Set-Alias which Get-Command
@@ -478,7 +245,7 @@ if (Get-Command nvim -ErrorAction SilentlyContinue) {
     Set-Alias vim nvim
 }
 
-# ---------- 11. 常用函数 ----------
+# ---------- 10. 常用函数 ----------
 # 目录浏览和快速跳转。
 # 优先用 eza：图标、Git 状态、目录优先、统一时间格式；没有 eza 时回退到 Get-ChildItem。
 $script:HasEza = [bool](Get-Command eza -ErrorAction SilentlyContinue)
@@ -511,11 +278,6 @@ function Invoke-PrettyList {
     }
 }
 
-function l {
-    param([Parameter(ValueFromRemainingArguments = $true)][object[]]$Args)
-    Invoke-PrettyList @Args
-}
-
 function ls {
     param([Parameter(ValueFromRemainingArguments = $true)][object[]]$Args)
     Invoke-PrettyList @Args
@@ -536,19 +298,6 @@ function la {
     Invoke-PrettyList -ExtraArgs $extra @Args
 }
 
-function lf {
-    param([Parameter(ValueFromRemainingArguments = $true)][object[]]$Args)
-    if ($script:HasEza) {
-        $extra = @('-a') + $script:EzaLongArgs
-        if (Get-Command git -ErrorAction SilentlyContinue) {
-            $extra += '--git'
-        }
-        Invoke-PrettyList -ExtraArgs $extra @Args
-    } else {
-        Get-ChildItem -Force @Args
-    }
-}
-
 function lt {
     param([Parameter(ValueFromRemainingArguments = $true)][object[]]$Args)
     if ($script:HasEza) {
@@ -556,24 +305,6 @@ function lt {
         Invoke-PrettyList -ExtraArgs $extra @Args
     } else {
         Get-ChildItem -Force @Args
-    }
-}
-
-function ld {
-    param([Parameter(ValueFromRemainingArguments = $true)][object[]]$Args)
-    if ($script:HasEza) {
-        Invoke-PrettyList -ExtraArgs @('-D') @Args
-    } else {
-        Get-ChildItem -Directory @Args
-    }
-}
-
-function lx {
-    param([Parameter(ValueFromRemainingArguments = $true)][object[]]$Args)
-    if ($script:HasEza) {
-        Invoke-PrettyList -ExtraArgs (@($script:EzaLongArgs) + @('--sort=modified', '-r')) @Args
-    } else {
-        Get-ChildItem @Args | Sort-Object LastWriteTime -Descending
     }
 }
 
@@ -617,31 +348,17 @@ function reload-profile {
     }
 }
 
-function use-starship {
-    $env:USE_PROMPT_THEME = 'starship'
-    . $PROFILE.CurrentUserCurrentHost
-}
-
-function use-ohmyposh {
-    $env:USE_PROMPT_THEME = 'oh-my-posh'
-    . $PROFILE.CurrentUserCurrentHost
-}
-
-function set-default-starship {
-    [Environment]::SetEnvironmentVariable('USE_PROMPT_THEME', 'starship', 'User')
-    $env:USE_PROMPT_THEME = 'starship'
-    . $PROFILE.CurrentUserCurrentHost
-}
-
-function set-default-ohmyposh {
-    [Environment]::SetEnvironmentVariable('USE_PROMPT_THEME', 'oh-my-posh', 'User')
-    $env:USE_PROMPT_THEME = 'oh-my-posh'
-    . $PROFILE.CurrentUserCurrentHost
-}
-
-function clear-default-prompt-theme {
-    [Environment]::SetEnvironmentVariable('USE_PROMPT_THEME', $null, 'User')
-    Remove-Item Env:USE_PROMPT_THEME -ErrorAction SilentlyContinue
+# 切换提示主题。使用 -Persist 参数可永久保存。
+function Switch-PromptTheme {
+    param(
+        [ValidateSet('starship', 'oh-my-posh')]
+        [string]$Theme = 'starship',
+        [switch]$Persist
+    )
+    if ($Persist) {
+        [Environment]::SetEnvironmentVariable('USE_PROMPT_THEME', $Theme, 'User')
+    }
+    $env:USE_PROMPT_THEME = $Theme
     . $PROFILE.CurrentUserCurrentHost
 }
 
@@ -668,7 +385,7 @@ function devinfo {
     }
 }
 
-# ---------- 12. Git 快捷命令 ----------
+# ---------- 11. Git 快捷命令 ----------
 # 常用 Git 操作做短命令封装，提升输入效率。
 function gs   { git status @args }
 function ga   { git add @args }
@@ -686,7 +403,7 @@ function gcb  { git checkout -b @args }
 function gsw  { git switch @args }
 function gb   { git branch @args }
 
-# ---------- 13. 代理管理 ----------
+# ---------- 12. 代理管理 ----------
 # 一键开关本地代理，适合日常开发和工具链使用。
 $global:DEFAULT_PROXY = 'http://127.0.0.1:7890'
 
@@ -716,12 +433,11 @@ function check-proxy {
     Write-Host "🧭 ALL   : $($env:all_proxy   ?? '未设置')" -ForegroundColor DarkCyan
 }
 
-
-# ---------- 14. Windows 常用目录跳转 ----------
+# ---------- 13. Windows 常用目录跳转 ----------
 # 针对你的常用工作目录提供快速跳转函数，仅在 Windows 下启用。
 if ($IsWindows) {
     function cdNotion  {
-        if (Test-Path 'E:/知识库/The-Road-to-Safety-main/') { Set-Location 'E:/知识库/The-Road-to-Safety-main/' } else { Write-Warning '路径不存在：E:/知识库/The-Road-to-Safety-main/' }
+        if (Test-Path 'E:/MyKnowledge/The-Road-to-Safety-main/') { Set-Location 'E:/MyKnowledge/The-Road-to-Safety-main/' } else { Write-Warning '路径不存在：E:/MyKnowledge/The-Road-to-Safety-main/' }
     }
 
     function cdTools   {
@@ -733,19 +449,10 @@ if ($IsWindows) {
     }
 
     function cdXray    {
-        if (Test-Path 'E:/SafeTools/Penetration/Vulnerability_Scanning/xray/') { Set-Location 'E:/SafeTools/Penetration/Vulnerability_Scanning/xray/' } else { Write-Warning '路径不存在：E:/SafeTools/Penetration/Vulnerability_Scanning/xray/' }
+        if (Test-Path 'E:/tools/Penetration/Vulnerability_Scanning/xray/') { Set-Location 'E:/tools/Penetration/Vulnerability_Scanning/xray/' } else { Write-Warning '路径不存在：E:/tools/Penetration/Vulnerability_Scanning/xray/' }
     }
 
     function cdSslscan {
-        if (Test-Path 'E:/SafeTools/Penetration/Information_Collection/others/sslscan-2.2.0/') { Set-Location 'E:/SafeTools/Penetration/Information_Collection/others/sslscan-2.2.0/' } else { Write-Warning '路径不存在：E:/SafeTools/Penetration/Information_Collection/others/sslscan-2.2.0/' }
+        if (Test-Path 'D:/SoftWare/scoop/apps/sslscan/2.2.2/') { Set-Location 'D:/SoftWare/scoop/apps/sslscan/2.2.2/' } else { Write-Warning '路径不存在：D:/SoftWare/scoop/apps/sslscan/2.2.2/' }
     }
 }
-# ---------- 15. 启动提示 ----------
-# 已禁用启动横幅，避免与 starship 或终端自身输出重复。
-
-
-
-
-
-
-

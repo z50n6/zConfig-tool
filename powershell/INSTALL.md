@@ -1,14 +1,5 @@
 # PowerShell 配置安装指南
 
-适用目录：
-
-- `E:\知识库\zConfig-tool\powershell`
-
-相关文件：
-
-- 配置文件：`Microsoft.PowerShell_profile.ps1`
-- 使用说明：`README.md`
-
 这份文档只关注一件事：**如何在一台新 Windows 机器上快速安装并跑通这套 PowerShell 配置。**
 
 ---
@@ -18,39 +9,36 @@
 安装完成后，你将获得：
 
 - PowerShell 7 开发环境
-- `starship` 默认提示符
-- 可切回 `oh-my-posh`
-- `eza` 增强版目录命令
+- `starship` 默认提示符（可切 `oh-my-posh`）
+- `eza` 增强版目录命令（ls / ll / la / lt）
 - `PSReadLine` 简洁风格高亮与历史预测
-- `PSFzf + fzf` 模糊搜索
+- `fzf` 模糊搜索文件和历史（原生调用，无需 PSFzf 模块）
 - `zoxide` 智能跳目录
 - Git 快捷命令
-- 命令不存在时的安装建议
+- 代理一键开关
 
 ---
 
-## 2. 推荐安装顺序
-
-建议按以下顺序安装：
+## 2. 安装顺序
 
 1. PowerShell 7
 2. Git
 3. Windows Terminal
 4. Nerd Font
 5. starship
-6. oh-my-posh（可选但推荐）
+6. oh-my-posh（可选）
 7. eza
 8. fzf
 9. zoxide
 10. Neovim
 11. PowerShell 模块
 12. 复制配置文件
-13. 修改硬编码路径
-14. 测试并切换提示符
+13. 检查硬编码路径
+14. 测试
 
 ---
 
-## 3. 基础软件安装
+## 3. 基础软件
 
 ### 3.1 PowerShell 7
 
@@ -58,18 +46,7 @@
 winget install Microsoft.PowerShell -e
 ```
 
-验证：
-
-```powershell
-pwsh
-$PSVersionTable.PSVersion
-```
-
-要求：
-
-- `7.0+`
-
----
+验证：`pwsh -c '$PSVersionTable.PSVersion'`（要求 7.0+）
 
 ### 3.2 Git
 
@@ -77,43 +54,23 @@ $PSVersionTable.PSVersion
 winget install Git.Git -e
 ```
 
-验证：
-
-```powershell
-git --version
-```
-
----
-
 ### 3.3 Windows Terminal
 
 ```powershell
 winget install Microsoft.WindowsTerminal -e
 ```
 
----
-
 ### 3.4 Nerd Font
 
-推荐安装 Nerd Font，否则：
-
-- `starship` 图标
-- `oh-my-posh` 图标
-- `eza` 图标
-
-可能显示不正常。
-
-推荐字体：
+推荐安装 Nerd Font（否则 starship / oh-my-posh / eza 图标显示异常）：
 
 - CaskaydiaCove Nerd Font
 - MesloLGS NF
 - JetBrainsMono Nerd Font
 
-安装后请在 Windows Terminal 中切换到对应字体。
-
 ---
 
-## 4. 主题与工具安装
+## 4. 主题与工具
 
 ### 4.1 starship（当前默认）
 
@@ -121,59 +78,17 @@ winget install Microsoft.WindowsTerminal -e
 winget install Starship.Starship -e
 ```
 
-或：
-
-```powershell
-scoop install starship
-```
-
-验证：
-
-```powershell
-starship --version
-```
-
----
-
 ### 4.2 oh-my-posh（保留备用）
 
 ```powershell
 winget install JanDeDobbeleer.OhMyPosh -e
 ```
 
-或：
-
-```powershell
-scoop install oh-my-posh
-```
-
-验证：
-
-```powershell
-oh-my-posh version
-```
-
----
-
 ### 4.3 eza
 
 ```powershell
-winget install --id eza-community.eza -e
+winget install eza-community.eza -e
 ```
-
-或：
-
-```powershell
-scoop install eza
-```
-
-验证：
-
-```powershell
-eza --version
-```
-
----
 
 ### 4.4 fzf
 
@@ -181,19 +96,7 @@ eza --version
 winget install junegunn.fzf -e
 ```
 
-或：
-
-```powershell
-scoop install fzf
-```
-
-验证：
-
-```powershell
-fzf --version
-```
-
----
+> 仅需 fzf.exe，**不需要安装 PSFzf 模块**。Profile 通过 PSReadLine KeyHandler 直接调用 fzf。
 
 ### 4.5 zoxide
 
@@ -201,136 +104,57 @@ fzf --version
 winget install ajeetdsouza.zoxide -e
 ```
 
-或：
-
-```powershell
-scoop install zoxide
-```
-
-验证：
-
-```powershell
-zoxide --version
-```
-
----
-
 ### 4.6 Neovim（推荐）
 
 ```powershell
 winget install Neovim.Neovim -e
 ```
 
-或：
-
-```powershell
-scoop install neovim
-```
-
-验证：
-
-```powershell
-nvim --version
-```
-
 ---
 
-## 5. PowerShell 模块安装
-
-在 `pwsh` 中执行：
+## 5. PowerShell 模块
 
 ```powershell
 Install-Module Terminal-Icons -Scope CurrentUser -Force
 Install-Module posh-git -Scope CurrentUser -Force
 Install-Module PSReadLine -Scope CurrentUser -Force
-Install-Module PSFzf -Scope CurrentUser -Force
 ```
 
 验证：
 
 ```powershell
-Get-Module -ListAvailable Terminal-Icons, posh-git, PSReadLine, PSFzf
+Get-Module -ListAvailable Terminal-Icons, posh-git, PSReadLine
 ```
 
 ---
 
-## 6. 用于安装建议的可选来源
-
-如果你希望“命令不存在时自动给安装建议”，推荐尽量具备这些来源：
-
-- `winget`
-- `scoop`
-- `choco`
-- `npm`
-
-### scoop
+## 6. 复制配置文件
 
 ```powershell
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm get.scoop.sh | iex
+Copy-Item 'E:\知识库\zConfig-tool\powershell\Microsoft.PowerShell_profile.ps1' $PROFILE.CurrentUserCurrentHost -Force
 ```
 
-验证：
-
-```powershell
-scoop --version
-```
-
-### Node.js / npm
-
-```powershell
-winget install OpenJS.NodeJS.LTS -e
-```
-
-验证：
-
-```powershell
-node -v
-npm -v
-```
-
----
-
-## 7. 复制配置文件
-
-查看当前 Profile 路径：
-
-```powershell
-$PROFILE.CurrentUserCurrentHost
-```
-
-如目录不存在，先创建：
+如目录不存在：
 
 ```powershell
 New-Item -ItemType Directory -Force (Split-Path $PROFILE.CurrentUserCurrentHost)
 ```
 
-复制配置：
-
-```powershell
-Copy-Item `
-  'E:\知识库\zConfig-tool\powershell\Microsoft.PowerShell_profile.ps1' `
-  $PROFILE.CurrentUserCurrentHost `
-  -Force
-```
-
 ---
 
-## 8. 迁移前必须检查的硬编码路径
+## 7. 迁移前必须检查
 
-### 8.1 oh-my-posh 主题路径
+### 7.1 oh-my-posh 主题路径
 
-当前配置内保留：
+当前自动从 scoop 目录动态查找 `amro.omp.json`（无需手动改版本号）。如果使用自定义主题目录，设置环境变量：
 
 ```powershell
-D:\Documents\PowerShell\themes\amro-custom.omp.json
+[Environment]::SetEnvironmentVariable('POSH_THEMES_PATH', 'D:\your\themes', 'User')
 ```
 
-如果以后要切到 `oh-my-posh`，这个路径必须正确。
+### 7.2 个人目录跳转
 
-### 8.2 自定义目录跳转路径
-
-以下函数是个人环境路径：
+以下函数是个人环境路径，迁移到新机器时通常需要修改或删除：
 
 - `cdNotion`
 - `cdTools`
@@ -338,42 +162,29 @@ D:\Documents\PowerShell\themes\amro-custom.omp.json
 - `cdXray`
 - `cdSslscan`
 
-迁移到新机器时通常都要改。
+### 7.3 代理地址
 
-### 8.3 代理地址
-
-当前默认：
-
-```powershell
-http://127.0.0.1:7890
-```
-
-如端口不同，请修改：
-
-```powershell
-$global:DEFAULT_PROXY
-```
+默认 `http://127.0.0.1:7890`，如端口不同请修改 `$global:DEFAULT_PROXY`。
 
 ---
 
-## 9. 重新加载配置
+## 8. 重新加载
 
 ```powershell
 . $PROFILE.CurrentUserCurrentHost
 ```
 
-或者直接重开终端。
+或重开终端。
 
 ---
 
-## 10. 安装完成后的测试
-
-建议依次执行：
+## 9. 安装后测试
 
 ```powershell
 devinfo
 ls
 ll
+la
 lt
 gs
 proxy
@@ -384,74 +195,14 @@ reload-profile
 测试主题切换：
 
 ```powershell
-use-starship
-use-ohmyposh
-set-default-starship
-set-default-ohmyposh
-clear-default-prompt-theme
-```
-
-测试安装建议：
-
-```powershell
-yazi
+Switch-PromptTheme starship       # 临时切到 starship
+Switch-PromptTheme oh-my-posh     # 临时切到 oh-my-posh
+Switch-PromptTheme oh-my-posh -Persist   # 永久设为 oh-my-posh
 ```
 
 ---
 
-## 11. 常见问题
-
-### 11.1 为什么默认不是 oh-my-posh？
-
-因为当前配置默认主题已经调整为：
-
-```powershell
-starship
-```
-
-如需切回：
-
-```powershell
-use-ohmyposh
-```
-
-或：
-
-```powershell
-set-default-ohmyposh
-```
-
-### 11.2 为什么没有自定义横幅？
-
-因为当前已禁用：
-
-- 启动横幅
-- 自定义回退 prompt
-
-这样可以减少和 `starship / oh-my-posh` 的冲突。
-
-### 11.3 为什么有些命令不存在时不给安装建议？
-
-因为现在采用的是**高置信匹配优先**策略。  
-弱匹配不会乱推荐，避免出现：
-
-- `fasd -> zoxide`
-
-这种明显不靠谱的建议。
-
-### 11.4 为什么 `fzf` 和 `PSReadLine` 没有很花哨？
-
-因为当前配置已经刻意调成：
-
-- 简洁
-- 低饱和
-- 长时间使用不累眼
-
-不是“炫技型”风格。
-
----
-
-## 12. 一条龙安装参考
+## 10. 一条龙安装参考
 
 ```powershell
 winget install Microsoft.PowerShell -e
@@ -463,7 +214,6 @@ winget install eza-community.eza -e
 winget install junegunn.fzf -e
 winget install ajeetdsouza.zoxide -e
 winget install Neovim.Neovim -e
-winget install OpenJS.NodeJS.LTS -e
 ```
 
 然后安装 PowerShell 模块：
@@ -472,6 +222,24 @@ winget install OpenJS.NodeJS.LTS -e
 Install-Module Terminal-Icons -Scope CurrentUser -Force
 Install-Module posh-git -Scope CurrentUser -Force
 Install-Module PSReadLine -Scope CurrentUser -Force
-Install-Module PSFzf -Scope CurrentUser -Force
 ```
 
+---
+
+## 11. 常见问题
+
+### Q1：为什么默认不是 oh-my-posh？
+
+默认是 `starship`。切回 oh-my-posh：
+
+```powershell
+Switch-PromptTheme oh-my-posh -Persist
+```
+
+### Q2：为什么 Ctrl+f / Ctrl+r 不工作？
+
+需要安装 fzf.exe（`winget install junegunn.fzf -e`）。Profile 不再依赖 PSFzf 模块，直接调用 fzf.exe。
+
+### Q3：为什么没有命令不存在的安装建议了？
+
+该功能已移除（精简 ~300 行），启动速度更快，打错命令时不再触发包管理器搜索。
