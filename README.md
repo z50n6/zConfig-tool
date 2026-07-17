@@ -69,7 +69,6 @@ Set-ExecutionPolicy RemoteSigned
 Install-Module -Name Terminal-Icons -Repository PSGallery
 Install-Module -Name posh-git -Scope CurrentUser
 Install-Module -Name PSReadLine -Force
-Install-Module -Name PSFzf
 ```
 
 #### 2) Starship
@@ -161,4 +160,3 @@ Windows 下常用的链接方式（管理员或开发者模式视系统而定）
 - **NuShell 与 PowerShell 代理端口不一致**：PowerShell 默认 `7890`，NuShell 配置里是 `7897`，按你实际代理软件端口统一即可。
 - **Neovim Treesitter 编译失败**：优先确保 `clang` 可用（或按 `nvim/README.md` 的 Scoop 依赖安装），再在 Neovim 里执行 `:TSUpdate`、` :checkhealth nvim-treesitter`。
 - **终端图标乱码**：确认终端与编辑器都在用 Nerd Font。
-

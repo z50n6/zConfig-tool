@@ -25,7 +25,7 @@ return {
       },
       formatters_by_ft = {
         lua = { "stylua" },
-        python = { "isort", "black" },
+        python = { "ruff_format" },
         javascript = { "prettier" },
         javascriptreact = { "prettier" },
         typescript = { "prettier" },
@@ -44,6 +44,11 @@ return {
       formatters = {
         prettier = {
           prepend_args = { "--single-quote", "--trailing-comma", "all" },
+        },
+        ruff_format = {
+          command = "ruff",
+          args = { "format", "--stdin-filename", "$FILENAME", "-" },
+          stdin = true,
         },
         ["clang-format"] = {
           command = "clang-format",
@@ -77,8 +82,6 @@ return {
       add_unique(opts.ensure_installed, {
         "stylua",
         "prettier",
-        "black",
-        "isort",
         "goimports",
         "shfmt",
         "shellcheck",
@@ -88,16 +91,14 @@ return {
         "pyright",
         "ruff",
         "vtsls",
-        "typescript-language-server",
         "html-lsp",
         "css-lsp",
         "tailwindcss-language-server",
-        "gopls",
-        "marksman",
         "yaml-language-server",
         "json-lsp",
         "clangd",
         "clang-format",
+        "gopls",
         "cmake-language-server",
         "cmakelang",
         "texlab",

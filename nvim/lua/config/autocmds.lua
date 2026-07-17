@@ -65,7 +65,17 @@ autocmd("VimResized", {
 
 autocmd("FileType", {
   group = user_group,
-  pattern = { "lua", "python", "javascript", "javascriptreact", "typescript", "typescriptreact", "json", "yaml", "markdown" },
+  pattern = {
+    "lua",
+    "python",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "json",
+    "yaml",
+    "markdown",
+  },
   desc = "统一 2 空格缩进",
   callback = function()
     vim.opt_local.expandtab = true
@@ -82,7 +92,8 @@ autocmd("FileType", {
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
-    vim.opt_local.spell = true
+    -- 纯阅读场景不开拼写检查
+    vim.opt_local.spell = false
     vim.opt_local.conceallevel = 2
     vim.opt_local.concealcursor = "nc"
   end,

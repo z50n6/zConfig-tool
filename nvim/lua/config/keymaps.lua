@@ -294,29 +294,6 @@ map("n", "<leader>ub", function()
   vim.notify("光标已切换：" .. (vim.g.anime_cursor_scheme == "rem_blue" and "雷姆蓝" or "拉姆粉"))
 end, opts("切换光标：雷姆蓝/拉姆粉"))
 
--- Markdown
-local function run_markdown_preview(cmd)
-  local ok = pcall(vim.cmd, cmd)
-  if ok then
-    return
-  end
-  vim.notify(
-    "Markdown 预览未就绪：请执行 :Lazy build markdown-preview.nvim 后重试",
-    vim.log.levels.WARN
-  )
-end
-
-map("n", "<leader>mp", function()
-  run_markdown_preview("MarkdownPreviewToggle")
-end, opts("Markdown 预览开关"))
-map("n", "<leader>mP", function()
-  run_markdown_preview("MarkdownPreview")
-end, opts("Markdown 开始预览"))
-map("n", "<leader>ms", function()
-  run_markdown_preview("MarkdownPreviewStop")
-end, opts("Markdown 停止预览"))
-map("n", "<leader>mr", "<cmd>RenderMarkdown toggle<cr>", opts("Markdown 渲染开关"))
-map("n", "<leader>mR", "<cmd>RenderMarkdown preview<cr>", opts("Markdown 渲染侧边预览"))
 
 -- 主题切换/重载后可能覆盖 Cursor 高亮，这里自动重新应用。
 vim.api.nvim_create_autocmd("ColorScheme", {

@@ -45,8 +45,23 @@ return {
             },
           },
         },
-        pyright = {},
-        ruff = {},
+        pyright = {
+          settings = {
+            python = {
+              analysis = {
+                typeCheckingMode = "standard",
+                autoImportCompletions = true,
+                diagnosticMode = "openFilesOnly",
+                useLibraryCodeForTypes = true,
+              },
+            },
+          },
+        },
+        ruff = {
+          init_options = {
+            settings = {},
+          },
+        },
         html = {},
         cssls = {},
         tailwindcss = {
@@ -130,6 +145,7 @@ return {
             },
           },
         },
+        bashls = {},
         yamlls = {
           settings = {
             yaml = {
@@ -139,7 +155,6 @@ return {
             },
           },
         },
-        marksman = {},
         jsonls = {},
         clangd = {},
         texlab = {},
@@ -167,6 +182,7 @@ return {
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       add_unique(opts.ensure_installed, {
+        "bashls",
         "lua_ls",
         "pyright",
         "ruff",
@@ -176,7 +192,6 @@ return {
         "vtsls",
         "gopls",
         "yamlls",
-        "marksman",
         "jsonls",
         "clangd",
         "texlab",

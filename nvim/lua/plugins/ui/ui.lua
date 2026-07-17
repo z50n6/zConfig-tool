@@ -55,62 +55,27 @@ return {
     end,
   },
   {
-    "iamcco/markdown-preview.nvim",
-    ft = { "markdown" },
-    cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
-    build = "cd app && npm install",
-    init = function()
-      vim.g.mkdp_auto_start = 0
-      vim.g.mkdp_auto_close = 1
-      vim.g.mkdp_refresh_slow = 0
-      vim.g.mkdp_theme = "dark"
-      vim.g.mkdp_combine_preview = 1
-      vim.g.mkdp_combine_preview_auto_refresh = 1
-      vim.g.mkdp_echo_preview_url = 1
-      vim.g.mkdp_preview_options = {
-        disable_sync_scroll = 0,
-        sync_scroll_type = "relative",
-        hide_yaml_meta = 1,
-        disable_filename = 1,
-        toc = {},
-      }
-      vim.g.mkdp_filetypes = { "markdown" }
-    end,
-  },
-  {
-    "MeanderingProgrammer/render-markdown.nvim",
-    ft = { "markdown" },
+    "OXY2DEV/markview.nvim",
+    lazy = false,
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
-      "nvim-mini/mini.nvim",
+      "nvim-tree/nvim-web-devicons",
     },
-    opts = {
-      preset = "lazy",
-      file_types = { "markdown" },
-      completions = {
-        lsp = { enabled = true },
-      },
-      anti_conceal = {
-        enabled = true,
-        above = 1,
-        below = 1,
-      },
-      heading = {
-        enabled = true,
-        sign = true,
-      },
-      code = {
-        sign = false,
-        width = "block",
-        right_pad = 1,
-      },
-      checkbox = {
-        enabled = true,
-      },
-      bullet = {
-        enabled = true,
-      },
-    },
+    config = function()
+      local ok, presets = pcall(require, "markview.presets")
+      require("markview").setup({
+        preset = ok and presets.obsidian or nil,
+        -- 纯阅读：所有模式都渲染，不显示原始语法
+        modes = { "n", "no", "c", "i" },
+        hybrid_modes = {},
+        callbacks = {
+          on_enable = function(_, win)
+            vim.wo[win].conceallevel = 2
+            vim.wo[win].concealcursor = "nc"
+          end,
+        },
+      })
+    end,
   },
   {
     "nvim-treesitter/nvim-treesitter",
@@ -121,21 +86,34 @@ return {
         "c",
         "cpp",
         "cmake",
+        "css",
+        "diff",
+        "dockerfile",
+        "gitcommit",
+        "gitignore",
         "go",
         "gomod",
         "gosum",
         "gowork",
+        "html",
+        "java",
         "javascript",
         "jsdoc",
         "json",
         "jsonc",
         "lua",
         "luadoc",
+        "make",
         "markdown",
         "markdown_inline",
+        "php",
         "python",
         "query",
         "regex",
+        "ruby",
+        "rust",
+        "scss",
+        "sql",
         "latex",
         "bibtex",
         "toml",
@@ -143,6 +121,8 @@ return {
         "typescript",
         "vim",
         "vimdoc",
+        "vue",
+        "xml",
         "yaml",
       })
     end,

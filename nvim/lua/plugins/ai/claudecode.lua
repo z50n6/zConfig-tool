@@ -24,7 +24,7 @@ return {
       { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "当前文件加入 Claude 上下文" },
       { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "选区发送到 Claude" },
       {
-        "<leader>as",
+       "<leader>as",
         "<cmd>ClaudeCodeTreeAdd<cr>",
         desc = "文件树中文件加入 Claude",
         ft = { "NvimTree", "neo-tree", "oil", "minifiles", "netrw", "snacks_layout_box" },
